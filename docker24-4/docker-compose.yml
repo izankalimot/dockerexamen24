@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  nginx-proxy:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: always
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - proxy_net
+      - backend_net
+    depends_on:
+      - web-server-1
+      - web-server-2
+
+  web-server-1:
+    image: nginx:latest
+    container_name: web-server-1
+    restart: always
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+    networks:
+      - backend_net
+
+  web-server-2:
+    image: nginx:latest
+    container_name: web-server-2
+    restart: always
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+    networks:
+      - backend_net
+
+networks:
+  proxy_net:
+  backend_net:
+    internal: true
