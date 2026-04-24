@@ -34,7 +34,7 @@ Para este proyecto se ha seleccionado la imagen oficial de **Nginx (`nginx:lates
 
 La infraestructura utiliza un modelo de doble red para garantizar la seguridad:
 
-*   **`proxy_net`**: Red pública (o expuesta al host) donde reside el proxy inverso. Es el único punto de entrada desde el exterior.
+*   **`proxy_net`**: Red expuesta al host donde reside el proxy inverso. Es el único punto de entrada desde el exterior.
 *   **`backend_net`**: Red configurada como `internal: true`. Esto significa que los servidores backend pueden comunicarse con el proxy, pero **no tienen acceso directo a la red externa** ni pueden ser contactados directamente desde fuera del entorno Docker.
 
 ## 🛠️ Comandos Necesarios
