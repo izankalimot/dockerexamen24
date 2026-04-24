@@ -68,3 +68,60 @@ docker-compose logs -f nginx-proxy
 - `nginx-proxy.conf`: Configuración del balanceo y cabeceras.
 - `web/`: Carpeta compartida con el código HTML.
 - `web/imagenes/`: Almacén de contenido multimedia (imágenes y vídeo).
+
+## 🧪 Verificaciones (Extraído de "Verificación Capturas")
+
+### 1. Contenedores en ejecución
+Se verifica el estado de los servicios y el mapeo de puertos:
+
+```text
+NAME           IMAGE          COMMAND                  SERVICE        CREATED          STATUS          PORTS
+nginx-proxy    nginx:latest   "/docker-entrypoint.…"   nginx-proxy    11 minutes ago   Up 11 minutes   0.0.0.0:80->80/tcp, [::]:80->80/tcp
+web-server-1   nginx:latest   "/docker-entrypoint.…"   web-server-1   11 minutes ago   Up 11 minutes   80/tcp
+web-server-2   nginx:latest   "/docker-entrypoint.…"   web-server-2   11 minutes ago   Up 11 minutes   80/tcp
+```
+
+### 2. Balanceo de carga
+El tráfico se distribuye correctamente entre los backends:
+- **172.21.0.2:80** → `web-server-1`
+- **172.21.0.3:80** → `web-server-2`
+
+**Prueba de cabeceras:**
+```text
+C:\Users\Izan\Desktop\docker24-4>curl.exe -I http://localhost
+HTTP/1.1 200 OK
+...
+X-Served-By: 172.21.0.2:80
+
+C:\Users\Izan\Desktop\docker24-4>curl.exe -I http://localhost
+HTTP/1.1 200 OK
+...
+X-Served-By: 172.21.0.3:80
+```
+
+### 3. Logs de los Backends
+Se confirma que ambos servidores están recibiendo y procesando peticiones:
+- **web-server-1**: Funcionando y registrando tráfico.
+- **web-server-2**: Funcionando y registrando tráfico.
+
+### 4. Red Aislada
+Línea clave: **“Internal”: true**. Los contenedores pueden hablar entre sí pero Docker prohíbe el tráfico de salida hacia el exterior.
+
+```text
+C:\Users\Izan\Desktop\docker24-4>docker network inspect docker24-4_backend_net
+[
+    {
+        "Name": "docker24-4_backend_net",
+        "Internal": true,
+        ...
+    }
+]
+```
+
+**Prueba de aislamiento (Host -> Backend):**
+Al intentar un `curl` directo desde el host a los servidores backend, se produce un **TIMEOUT**, confirmando que el host no sabe cómo llegar a la subred privada del backend.
+
+### 5. Acceso via Proxy
+Se verifica que el proxy tiene visibilidad total de los backends:
+- Conexión a **web-server-1** vía Proxy: OK
+- Conexión a **web-server-2** vía Proxy: OK
