@@ -69,7 +69,9 @@ docker-compose logs -f nginx-proxy
 - `web/`: Carpeta compartida con el código HTML.
 - `web/imagenes/`: Almacén de contenido multimedia (imágenes y vídeo).
 
-## 🧪 Verificaciones (Extraído de "Verificación Capturas")
+## 🧪 Verificaciones
+
+El PDF con las capturas está dentro de la carpeta docker24-4 > verificación-funcionamiento > Verificación Capturas (1).pdf
 
 ### 1. Contenedores en ejecución
 Se verifica el estado de los servicios y el mapeo de puertos:
